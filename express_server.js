@@ -6,11 +6,11 @@ const bodyParser = require("body-parser");
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
 
-//found solution on stackoverflow
-//setting Math.random toString with 36 as a parameter sets number >9 to alpha characters
+//found solution to generate random string on stackoverflow
+//setting Math.random toString with 36 as a parameter sets number > 9 to alpha characters
 function generateRandomString() {
-  let shortUrl = Math.random().toString(36).substring(2, 8);
-  console.log(shortUrl)
+  let shortURL = Math.random().toString(36).substring(2, 8);
+  return shortURL
 }
 
 var urlDatabase = {
@@ -37,9 +37,18 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  console.log(req.body);  // debug statement to see POST parameters
-  generateRandomString(req)
+  let newShortUrl = generateRandomString();
+  let newUrl = (req.body);
+  newUrl = newUrl.longURL;
+  urlDatabase[newShortUrl] =  newUrl
+  console.log('updated: ', urlDatabase)
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
+
+});
+
+app.get("/u/:shortURL", (req, res) => {
+  let longURL = urlDatabase[shortURL].longURL
+  res.redirect(longURL);
 });
 
 //add urls to template var
