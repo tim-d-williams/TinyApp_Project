@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>TinyApp</title>
+  <% include ./partials/_header %>
+</head>
+<body>
+  <ul>
+    <% for(var item in urls) { %>
+     <%  if(item === shortURL) { %>
+        <li><%= urls[item] %></li>
+      <% } %>
+      <% } %>
+  </ul>
+  <p><a href='#'> Submit URL for shortening</a>

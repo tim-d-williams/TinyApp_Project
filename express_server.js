@@ -16,6 +16,7 @@ app.get("/", (req, res) => {
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+console.log("hello")
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase };
@@ -23,7 +24,8 @@ app.get("/urls", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id };
+  let templateVars = { shortURL: req.params.id,
+    urls: urlDatabase };
   res.render("urls_show", templateVars);
 });
 

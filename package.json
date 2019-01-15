@@ -2,9 +2,10 @@
   "name": "tinyapp_project",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "express_server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "npx nodemon -L express_server.js"
   },
   "repository": {
     "type": "git",
@@ -18,7 +19,9 @@
   },
   "homepage": "https://github.com/tim-d-williams/TinyApp_Project#readme",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "ejs": "^2.6.1",
-    "express": "^4.16.4"
+    "express": "^4.16.4",
+    "nodemon": "^1.18.9"
   }
 }
