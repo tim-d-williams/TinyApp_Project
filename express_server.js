@@ -43,11 +43,10 @@ app.post("/urls", (req, res) => {
   urlDatabase[newShortUrl] =  newUrl
   console.log('updated: ', urlDatabase)
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
-
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[shortURL].longURL
+  let longURL = urlDatabase[req.params.shortURL]
   res.redirect(longURL);
 });
 
