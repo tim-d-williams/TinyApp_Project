@@ -6,11 +6,17 @@
   <% include ./partials/_header %>
 </head>
 <body>
-  <ul>
+  <table>
     <% for(var item in urls) { %>
-      <li><%= urls[item] %></li>
+      <tr>
+        <td><%= item %></td>
+        <td><%= urls[item] %></td>
+      <td><form method="POST" action=<%= `/urls/${item}/delete` %>>
+      <button type="submit">DELETE</button>
+    </form></td>
+      <tr>
       <% } %>
-  </ul>
+  </table>
   <p><a href='/urls/new'> Submit URL for shortening</a>
 </body>
 </html>

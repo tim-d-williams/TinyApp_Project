@@ -5,11 +5,19 @@
   <% include ./partials/_header %>
 </head>
 <body>
-  <ul>
-    <% for(var item in urls) { %>
-     <%  if(item === shortURL) { %>
-        <li><%= urls[item] %></li>
-      <% } %>
-      <% } %>
-  </ul>
-  <p><a href='#'> Submit URL for shortening</a>
+  <h1>Short URL: <%= shortURL %></h1>
+  <table>
+    <tr>
+  <% for(var item in urls) { %>
+  <%  if(item === shortURL) { %>
+    <td><%= urls[item] %> </td>
+  <% } %>
+  <% } %>
+    <td><form method="POST" action=<%= `/urls/${item}/update` %>>
+    <button type="submit">Update</button>
+
+  </form></td>
+    </tr>
+  </table>
+</body>
+</html>

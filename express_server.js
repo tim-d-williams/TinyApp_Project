@@ -18,13 +18,16 @@ var urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+// '/' returns 'Hello!'
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
 
+//return urlDatatbase
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
+
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase };
@@ -41,7 +44,7 @@ app.post("/urls", (req, res) => {
   let newUrl = (req.body);
   newUrl = newUrl.longURL;
   urlDatabase[newShortUrl] =  newUrl
-  res.send("Ok");         // Respond with 'Ok' (we will replace this)
+  res.redirect("/urls");
 });
 
 app.get("/u/:shortURL", (req, res) => {
@@ -58,6 +61,13 @@ app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id,
     urls: urlDatabase };
   res.render("urls_show", templateVars);
+});
+
+//use POST req to DELETE url entry
+app.post('/urls/:id/delete', (req, res) => {
+  let urlToDelete = req.params.id;
+  delete urlDatabase[urlToDelete]
+  res.redirect('/urls')
 });
 
 app.get("/hello", (req, res) => {
