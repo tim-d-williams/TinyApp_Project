@@ -41,13 +41,16 @@ app.post("/urls", (req, res) => {
   let newUrl = (req.body);
   newUrl = newUrl.longURL;
   urlDatabase[newShortUrl] =  newUrl
-  console.log('updated: ', urlDatabase)
   res.send("Ok");         // Respond with 'Ok' (we will replace this)
 });
 
 app.get("/u/:shortURL", (req, res) => {
+  if (urlDatabase[req.params.shortURL] === undefined) {
+    res.redirect(404, '/urls/new')
+  } else {
   let longURL = urlDatabase[req.params.shortURL]
   res.redirect(longURL);
+  }
 });
 
 //add urls to template var
