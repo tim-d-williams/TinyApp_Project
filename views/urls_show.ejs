@@ -7,17 +7,16 @@
 <body>
   <h1>Short URL: <%= shortURL %></h1>
   <table>
-    <tr>
   <% for(var item in urls) { %>
   <%  if(item === shortURL) { %>
-    <td><%= urls[item] %> </td>
-  <% } %>
-  <% } %>
-    <td><form method="POST" action=<%= `/urls/${item}/update` %>>
-    <button type="submit">Update</button>
+    <tr>
+      <td> <form method="POST" action="<%= `/urls/${item}/update` %>" >
+            <input type=text name="updatedUrl" id="updatedUrl" value=<%= urls[item] %> > </td>
+      <td> <button type="submit">Update URL</button> </td></form>
 
-  </form></td>
     </tr>
+  <% } %>
+  <% } %>
   </table>
 </body>
 </html>

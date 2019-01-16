@@ -47,7 +47,7 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls");
 });
 
-app.get("/u/:shortURL", (req, res) => {
+app.get("/url/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL] === undefined) {
     res.redirect(404, '/urls/new')
   } else {
@@ -69,6 +69,14 @@ app.post('/urls/:id/delete', (req, res) => {
   delete urlDatabase[urlToDelete]
   res.redirect('/urls')
 });
+
+//use POST to update url database entrty
+app.post('/urls/:id/update', (req, res) => {
+    let urlToUpdateId = req.params.id;
+    urlDatabase[urlToUpdateId] = req.body.updatedUrl
+    res.redirect('/urls')
+})
+
 
 app.get("/hello", (req, res) => {
   res.send("<html><body>Hello <b>World</b></body></html>\n");

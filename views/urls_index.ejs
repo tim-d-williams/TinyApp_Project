@@ -10,8 +10,9 @@
     <% for(var item in urls) { %>
       <tr>
         <td><%= item %></td>
-        <td><%= urls[item] %></td>
-      <td><form method="POST" action=<%= `/urls/${item}/delete` %>>
+        <td> <a href=<%= urls[item] %> target=_blank > <%= urls[item] %> </td>
+        <td> <a href=<%= `/urls/${item}` %> > Edit </a> </td>
+      <td> <form method="POST" action=<%= `/urls/${item}/delete` %> >
       <button type="submit">DELETE</button>
     </form></td>
       <tr>
