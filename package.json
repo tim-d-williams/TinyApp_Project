@@ -20,8 +20,10 @@
   "homepage": "https://github.com/tim-d-williams/TinyApp_Project#readme",
   "dependencies": {
     "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
     "ejs": "^2.6.1",
     "express": "^4.16.4",
+    "morgan": "^1.9.1",
     "nodemon": "^1.18.9"
   }
 }

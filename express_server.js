@@ -1,10 +1,16 @@
 var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
+var morgan = require('morgan');
+var cookieParser = require('cookie-parser');
+
 const bodyParser = require("body-parser");
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
+app.use(cookieParser());
+// set morgan
+app.use(morgan('dev'));
 
 //found solution to generate random string on stackoverflow
 //setting Math.random toString with 36 as a parameter sets number > 9 to alpha characters
@@ -28,9 +34,9 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
+  let templateVars = { urls: urlDatabase,
+    username: req.cookies["username"] };
   res.render("urls_index", templateVars);
 });
 
@@ -38,6 +44,12 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   res.render("urls_new");
 });
+
+//take login name and set cookie
+app.post("/login", (req, res) => {
+  let username = req.body.username
+  res.cookie('tinyapp', username).redirect('/urls');
+})
 
 app.post("/urls", (req, res) => {
   let newShortUrl = generateRandomString();
@@ -59,7 +71,8 @@ app.get("/url/:shortURL", (req, res) => {
 //add urls to template var
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id,
-    urls: urlDatabase };
+    urls: urlDatabase,
+    username: req.cookies["username"] };
   res.render("urls_show", templateVars);
 });
 
