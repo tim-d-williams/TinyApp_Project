@@ -49,26 +49,34 @@ app.get("/urls.json", (req, res) => {
 
 //take login name and set cookie
 app.post("/login", (req, res) => {
-  let username = req.body.username
-  res.cookie('username', username).redirect('/urls');
+  for (let key in users) {
+    if (users[key].email === req.body.email) {
+      res.cookie('user_id', users[key].id).redirect('/urls');
+    }
+  }
 })
 
-//create GET register endpoint
+//login page
+app.get('/login', (req, res) => {
+  res.render('login')
+})
+
+//GET register endpoint
 app.get('/register', (req, res) => {
   res.render('register')
 })
 
-//create POST route for register
+//POST route for register
 //add new user to the user data
 app.post('/register', (req, res) => {
   //if email or password is empty
   if (!req.body.email || !req.body.password) {
-    res.sendStatus(400);
+    res.status(400).send('You must provide email address and password');
   }
   //if email exists
   for (let key in users) {
     if (users[key].email === req.body.email) {
-      res.sendStatus(400);
+      res.status(400).send('Email address already exists');
     }
   }
   let newId = generateRandomString();
@@ -77,24 +85,25 @@ app.post('/register', (req, res) => {
     email: req.body.email,
     password: req.body.password
   }
-  res.cookie('user_id', newId.email).redirect('/urls')
+  res.cookie('user_id', newId.id).redirect('/urls')
 });
 
 //logout and clear cookie
 app.post("/logout", (req, res) => {
-  res.clearCookie('username').redirect('/urls');
+  res.clearCookie('user_id').redirect('/urls');
 });
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
-    username: req.cookies['username'] };
+    user_id: users[req.cookies["user_id"]] };
+    console.log(templateVars)
   res.render("urls_index", templateVars);
 });
 
 //return urls page to browser
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies['username'] };
+    user_id: users[req.cookies["user_id"]] };
   res.render("urls_new", templateVars);
 });
 
@@ -119,7 +128,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id,
     urls: urlDatabase,
-    username: req.cookies["username"] };
+    user_id: users[req.cookies["user_id"]] };
   res.render("urls_show", templateVars);
 });
 
