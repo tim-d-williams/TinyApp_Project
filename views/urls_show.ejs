@@ -11,7 +11,7 @@
   <%  if(item === shortURL) { %>
     <tr>
       <td> <form method="POST" action="<%= `/urls/${item}/update` %>" >
-            <input type=text name="updatedUrl" id="updatedUrl" value=<%= urls[item] %> > </td>
+            <input type=text name="updatedUrl" id="updatedUrl" value=<%= urls[item] %> style="width: 300px"> </td>
       <td> <button type="submit">Update URL</button> </td></form>
 
     </tr>

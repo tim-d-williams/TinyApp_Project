@@ -19,10 +19,23 @@ function generateRandomString() {
   return shortURL
 }
 
-var urlDatabase = {
+const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+const users = {
+  "111": {
+    id: "111",
+    email: "tim@example.com",
+    password: "beer"
+  },
+ "222": {
+    id: "222",
+    email: "test@example.com",
+    password: "suh"
+  }
+}
 
 // '/' returns 'Hello!'
 app.get("/", (req, res) => {
@@ -40,21 +53,48 @@ app.post("/login", (req, res) => {
   res.cookie('username', username).redirect('/urls');
 })
 
+//create GET register endpoint
+app.get('/register', (req, res) => {
+  res.render('register')
+})
+
+//create POST route for register
+//add new user to the user data
+app.post('/register', (req, res) => {
+  //if email or password is empty
+  if (!req.body.email || !req.body.password) {
+    res.sendStatus(400);
+  }
+  //if email exists
+  for (let key in users) {
+    if (users[key].email === req.body.email) {
+      res.sendStatus(400);
+    }
+  }
+  let newId = generateRandomString();
+  users[newId] = newId = {
+    id: newId,
+    email: req.body.email,
+    password: req.body.password
+  }
+  res.cookie('user_id', newId.email).redirect('/urls')
+});
+
 //logout and clear cookie
 app.post("/logout", (req, res) => {
   res.clearCookie('username').redirect('/urls');
-})
+});
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
-    username: req.cookies["username"] };
+    username: req.cookies['username'] };
   res.render("urls_index", templateVars);
 });
 
 //return urls page to browser
 app.get("/urls/new", (req, res) => {
   let templateVars = {
-    username: req.cookies["username"] };
+    username: req.cookies['username'] };
   res.render("urls_new", templateVars);
 });
 
@@ -66,7 +106,7 @@ app.post("/urls", (req, res) => {
   res.redirect("/urls");
 });
 
-app.get("/url/:shortURL", (req, res) => {
+app.get("/u/:shortURL", (req, res) => {
   if (urlDatabase[req.params.shortURL] === undefined) {
     res.redirect(404, '/urls/new')
   } else {
