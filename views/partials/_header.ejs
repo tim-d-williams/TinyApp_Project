@@ -2,6 +2,11 @@
 
 <title>TinyApp</title>
 <body>
-    <h1> user: <%= user_id.email %> </h1>
+    <div>
+        <a href="/register">Register</a>
+        <% if (user_id === undefined) { %>
+            <a href="/login">Login</a>
+           <% } %>
+    </div>
 </body>
 
