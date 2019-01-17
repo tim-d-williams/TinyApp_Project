@@ -10,9 +10,9 @@
   <table>
     <% for(var item in urls) { %>
       <tr>
-        <td><%= item %></td>
-        <td> <a href=<%= urls[item] %> target=_blank > <%= urls[item] %> </td>
-        <td> <a href=<%= `/urls/${item}` %> > Edit </a> </td>
+        <td> <a href=<%= `http://localhost:8080/u/${urls[item].shortURL}` %> >http://localhost:8080/u/<%= urls[item].shortURL %></a> </td>
+        <td> <a href=<%= urls[item].url %> target=_blank > <%= urls[item].url %> </td>
+        <td> <a href=<%= `/urls/${urls[item].shortURL}` %> > Edit </a> </td>
       <td> <form method="POST" action=<%= `/urls/${item}/delete` %> >
       <button type="submit">DELETE</button>
     </form></td>
