@@ -1,10 +1,12 @@
-<!DOCTYPE html>
+<!-- views/urls_index.ejs -->
 <html lang="en">
 <head>
   <title>TinyApp</title>
-  <% include ./partials/_header %>
 </head>
 <body>
+<header>
+<% include ./partials/_header %>
+</header>
   <table>
     <% for(var item in urls) { %>
       <tr>

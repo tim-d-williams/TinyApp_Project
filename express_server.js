@@ -47,16 +47,10 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
-//take login name and set cookie
-// In order to do this, the endpoint will first need to try and
-// find a user that matches the email submitted via the login form.
-// If a user with that e-mail cannot be found, return a response
-// with a 403 status code.
-
-// If a user with that e-mail address is located,
-// compare the password given in the form with the existing user's
-// password. If it does not match, return a response with a 403 status code.
-
+//take login name, verify email exist
+  //validate password is correct
+    //if both pass set cookie and return to /
+  // if fail, return 403
 app.post("/login", (req, res) => {
   for (let key in users) {
     if (users[key].email === req.body.email) {
