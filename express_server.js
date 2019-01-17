@@ -34,6 +34,17 @@ app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
 });
 
+//take login name and set cookie
+app.post("/login", (req, res) => {
+  let username = req.body.username
+  res.cookie('username', username).redirect('/urls');
+})
+
+//logout and clear cookie
+app.post("/logout", (req, res) => {
+  res.clearCookie('username').redirect('/urls');
+})
+
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase,
     username: req.cookies["username"] };
@@ -42,14 +53,10 @@ app.get("/urls", (req, res) => {
 
 //return urls page to browser
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  let templateVars = {
+    username: req.cookies["username"] };
+  res.render("urls_new", templateVars);
 });
-
-//take login name and set cookie
-app.post("/login", (req, res) => {
-  let username = req.body.username
-  res.cookie('tinyapp', username).redirect('/urls');
-})
 
 app.post("/urls", (req, res) => {
   let newShortUrl = generateRandomString();

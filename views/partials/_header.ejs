@@ -4,13 +4,19 @@
 <table>
   <tr>
     <td>
+      <% if (username === undefined) { %>
       <form method="POST" action="/login">
       <input type=text name="username" value="" >
       <button type="submit">Login</button>
+      </form>
+
+      <% } else { %>
+
+      <form method="POST" action="/logout">
+      <button type="submit">Logout</button>
+      <% } %>
+      </form>
      </td>
-    <td>
-    <%= username %>
-    </td>
+    <td> user: <%= username %> </td>
    </tr>
-</form>
 </table>
