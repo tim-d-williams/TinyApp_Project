@@ -23,12 +23,12 @@ const urlDatabase = {
   "b2xVn2": {
     shortURL: "b2xVn2",
     url: "http://www.lighthouselabs.ca",
-    user_id: ""
+    user_id: "222"
   },
   "9sm5xK": {
     shortURL: "9sm5xK",
     url:  "http://www.google.com",
-    user_id: ""
+    user_id: "111"
   }
 };
 
@@ -44,6 +44,23 @@ const users = {
     password: "suh"
   }
 }
+
+//loop through url database
+  //if user id = logged in user id
+    //add to temp db
+let urlsForUser = id => {
+  let tempDb = {}
+  for (let key in urlDatabase) {
+    if (urlDatabase[key].user_id === id) {
+      tempDb[key] = {
+        shortURL: urlDatabase[key].shortURL,
+        url: urlDatabase[key].url,
+        user_id: urlDatabase[key].user_id,
+        }
+      }
+    } return tempDb
+  }
+
 
 // '/' returns 'Hello!'
 app.get("/", (req, res) => {
@@ -107,8 +124,10 @@ app.post("/logout", (req, res) => {
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase,
-    user_id: users[req.cookies["user_id"]] };
+  let userId = req.cookies.user_id
+  let templateVars = { urls: urlsForUser(userId),
+    user_id: users[req.cookies["user_id"]]
+  }; console.log(templateVars)
   res.render("urls_index", templateVars);
 });
 
