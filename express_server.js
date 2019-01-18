@@ -2,7 +2,8 @@ var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
 var morgan = require('morgan');
-var cookieParser = require('cookie-parser');
+// var cookieParser = require('cookie-parser');
+var cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
 
@@ -11,9 +12,17 @@ const bodyParser = require("body-parser");
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
-app.use(cookieParser());
+// app.use(cookieParser());
 // set morgan
 app.use(morgan('dev'));
+app.use(cookieSession({
+  name: 'session',
+  keys: ['javascript is fun'],
+
+  // Cookie Options
+  maxAge: 24 * 60 * 60 * 1000 // 24 hours
+
+}))
 
 //found solution to generate random string on stackoverflow
 //setting Math.random toString with 36 as a parameter sets number > 9 to alpha characters
@@ -87,7 +96,8 @@ app.get("/urls.json", (req, res) => {
           let password = req.body.password;
           check = bcrypt.compareSync(password, users[key].password)
           if (check) {
-          res.cookie('user_id', users[key].id).redirect('/urls');
+          req.session.user_id = users[key].id
+          res.redirect('/urls');
         } res.status(403).send('Login or password is incorrect')
       }
     } res.status(403).send('Email address doesn\'t exist')
@@ -123,28 +133,30 @@ app.post('/register', (req, res) => {
     email: req.body.email,
     password: hashedPassword
   }
-    res.cookie('user_id', newId.id).redirect('/urls')
+    req.session.user_id = newId.id;
+    res.redirect('/urls');
 });
 
 //logout and clear cookie
 app.post("/logout", (req, res) => {
-  res.clearCookie('user_id').redirect('/urls');
+  req.session.user_id = null
+  res.redirect('/urls');
 });
 
 app.get("/urls", (req, res) => {
-  let userId = req.cookies.user_id
+  let userId = req.session.user_id
   let templateVars = { urls: urlsForUser(userId),
-    user_id: users[req.cookies["user_id"]]
+    user_id: users[req.session.user_id]
   };
   res.render("urls_index", templateVars);
 });
 
 //return urls page to browser
 app.get("/urls/new", (req, res) => {
-  let userId = req.cookies.user_id
+  let userId = req.session.user_id
   if (userId) {
     let templateVars = {
-      user_id: users[req.cookies["user_id"]]
+      user_id: users[req.session.user_id]
     }
     res.render('urls_new', templateVars)
   } else {
@@ -157,7 +169,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[newShortUrl] = {
     shortURL: newShortUrl,
     url: (req.body.longURL),
-    user_id: req.cookies["user_id"]
+    user_id: req.session.user_id
   }
   res.redirect("/urls");
 });
@@ -175,7 +187,7 @@ app.get("/u/:shortURL", (req, res) => {
 app.get("/urls/:id", (req, res) => {
   let templateVars = { shortURL: req.params.id,
     urls: urlDatabase,
-    user_id: users[req.cookies["user_id"]] };
+    user_id: users[req.session.user_id] };
   res.render("urls_show", templateVars);
 });
 
@@ -183,7 +195,7 @@ app.get("/urls/:id", (req, res) => {
 //if url owner is same as logged in user allow delete
 app.post('/urls/:id/delete', (req, res) => {
   let urlToDelete = req.params.id;
-    if (urlDatabase[req.params.id].user_id === req.cookies["user_id"]) {
+    if (urlDatabase[req.params.id].user_id === req.session.user_id) {
       delete urlDatabase[urlToDelete]
       res.redirect('/urls')
     }
@@ -194,7 +206,7 @@ app.post('/urls/:id/delete', (req, res) => {
 //use POST to update url database entrty
 app.post('/urls/:id/update', (req, res) => {
   let urlToUpdateId = req.params.id;
-  if (urlDatabase[req.params.id].user_id === req.cookies["user_id"]) {
+  if (urlDatabase[req.params.id].user_id === req.session.user_id) {
     urlDatabase[urlToUpdateId].url = req.body.updatedUrl
     res.redirect('/urls')
   }
