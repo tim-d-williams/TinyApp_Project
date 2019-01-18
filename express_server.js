@@ -3,6 +3,9 @@ var app = express();
 var PORT = 8080; // default port 8080
 var morgan = require('morgan');
 var cookieParser = require('cookie-parser');
+const bcrypt = require('bcrypt');
+const saltRounds = 10;
+
 
 const bodyParser = require("body-parser");
 
@@ -77,15 +80,17 @@ app.get("/urls.json", (req, res) => {
     //if both pass set cookie and return to /
   // if fail, return 403
 app.post("/login", (req, res) => {
+  let hashedPassword = req.body.password;
   for (let key in users) {
     if (users[key].email === req.body.email) {
-      if(users[key].password === req.body.password) {
+      if (bcrypt.compare(users[key].password, hashedPassword)) {
         res.cookie('user_id', users[key].id).redirect('/urls');
       } res.status(403).send('Login or password is incorrect')
     } res.status(403).send('Email address doesn\'t exist')
   }
 })
-
+// check = bcrypt.compareSync(password, usersDatabase[username]);
+// bcrypt.compare(myPlaintextPassword, hash
 //login page
 app.get('/login', (req, res) => {
   res.render('login')
@@ -99,6 +104,7 @@ app.get('/register', (req, res) => {
 //POST route for register
 //add new user to the user data
 app.post('/register', (req, res) => {
+  console.log(users)
   //if email or password is empty
   if (!req.body.email || !req.body.password) {
     res.status(400).send('You must provide email address and password');
@@ -110,11 +116,13 @@ app.post('/register', (req, res) => {
     }
   }
   let newId = generateRandomString();
+  var hashedPassword = bcrypt.hashSync(req.body.password, saltRounds);
   users[newId] = newId = {
     id: newId,
     email: req.body.email,
-    password: req.body.password
+    password: hashedPassword
   }
+
   res.cookie('user_id', newId.id).redirect('/urls')
 });
 
@@ -155,6 +163,7 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
+  console.log(urlDatabase)
   if (urlDatabase[req.params.shortURL] === undefined) {
     res.redirect(404, '/urls/new')
   } else {
