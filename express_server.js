@@ -79,19 +79,20 @@ app.get("/urls.json", (req, res) => {
   //validate password is correct
     //if both pass set cookie and return to /
   // if fail, return 403
-app.post("/login", (req, res) => {
-  let hashedPassword = req.body.password;
-  for (let key in users) {
-    if (users[key].email === req.body.email) {
-      if (bcrypt.compare(users[key].password, hashedPassword)) {
-        res.cookie('user_id', users[key].id).redirect('/urls');
-      } res.status(403).send('Login or password is incorrect')
+  app.post("/login", (req, res) => {
+    for (let key in users) {
+      if (users[key].email === req.body.email) {
+        // if(users[key].password === req.body.password) {
+          let check;
+          let password = req.body.password;
+          check = bcrypt.compareSync(password, users[key].password)
+          if (check) {
+          res.cookie('user_id', users[key].id).redirect('/urls');
+        } res.status(403).send('Login or password is incorrect')
+      }
     } res.status(403).send('Email address doesn\'t exist')
-  }
-})
-// check = bcrypt.compareSync(password, usersDatabase[username]);
-// bcrypt.compare(myPlaintextPassword, hash
-//login page
+  })
+
 app.get('/login', (req, res) => {
   res.render('login')
 })
@@ -104,26 +105,25 @@ app.get('/register', (req, res) => {
 //POST route for register
 //add new user to the user data
 app.post('/register', (req, res) => {
-  console.log(users)
   //if email or password is empty
   if (!req.body.email || !req.body.password) {
-    res.status(400).send('You must provide email address and password');
+    res.sendStatus(400);
   }
   //if email exists
   for (let key in users) {
     if (users[key].email === req.body.email) {
-      res.status(400).send('Email address already exists');
+      res.sendStatus(400);
     }
   }
   let newId = generateRandomString();
-  var hashedPassword = bcrypt.hashSync(req.body.password, saltRounds);
+  let password = req.body.password;
+  var hashedPassword = bcrypt.hashSync(password, saltRounds);
   users[newId] = newId = {
     id: newId,
     email: req.body.email,
     password: hashedPassword
   }
-
-  res.cookie('user_id', newId.id).redirect('/urls')
+    res.cookie('user_id', newId.id).redirect('/urls')
 });
 
 //logout and clear cookie
@@ -135,7 +135,7 @@ app.get("/urls", (req, res) => {
   let userId = req.cookies.user_id
   let templateVars = { urls: urlsForUser(userId),
     user_id: users[req.cookies["user_id"]]
-  }; console.log(templateVars)
+  };
   res.render("urls_index", templateVars);
 });
 
@@ -163,7 +163,6 @@ app.post("/urls", (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  console.log(urlDatabase)
   if (urlDatabase[req.params.shortURL] === undefined) {
     res.redirect(404, '/urls/new')
   } else {
