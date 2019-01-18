@@ -127,8 +127,6 @@ app.get("/urls/new", (req, res) => {
 
 app.post("/urls", (req, res) => {
   let newShortUrl = generateRandomString();
-  //let newUrl = (req.body);
-  // newUrl = newUrl.longURL;
   urlDatabase[newShortUrl] = {
     shortURL: newShortUrl,
     url: (req.body.longURL),
@@ -155,17 +153,26 @@ app.get("/urls/:id", (req, res) => {
 });
 
 //use POST req to DELETE url entry
+//if url owner is same as logged in user allow delete
 app.post('/urls/:id/delete', (req, res) => {
   let urlToDelete = req.params.id;
-  delete urlDatabase[urlToDelete]
-  res.redirect('/urls')
+    if (urlDatabase[req.params.id].user_id === req.cookies["user_id"]) {
+      delete urlDatabase[urlToDelete]
+      res.redirect('/urls')
+    }
+    else
+      res.send('Only URL owner can delete')
 });
 
 //use POST to update url database entrty
 app.post('/urls/:id/update', (req, res) => {
-    let urlToUpdateId = req.params.id;
+  let urlToUpdateId = req.params.id;
+  if (urlDatabase[req.params.id].user_id === req.cookies["user_id"]) {
     urlDatabase[urlToUpdateId].url = req.body.updatedUrl
     res.redirect('/urls')
+  }
+  else
+    res.send('Only URL owner can update')
 })
 
 
