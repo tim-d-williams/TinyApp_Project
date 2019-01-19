@@ -1,16 +1,17 @@
 <!-- views/partials/header.ejs -->
-<!-- views/partials/header.ejs -->
 <title>TinyApp</title>
 <body>
-    <span>
-        <a href="/register">Register</a>
+    <div id='header'>
         <% if (user_id === undefined) { %>
+        <p><a href="/register">Register</a>
             <a href="/login">Login</a>
            <% } else { %>
+           <h1>Logged in as: <%= user_id.email %>
            <form method="POST" action="/logout">
-           <button type='submit'>Logout</button>
-           </form>
+           <button type="submit">Logout</button>
+           </form> </h1>
            <% } %>
-    </span>
+        </p>
+    </div>
 </body>
 

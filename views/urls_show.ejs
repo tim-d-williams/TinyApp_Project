@@ -7,15 +7,16 @@
   <header>
     <% include ./partials/_header %>
   </header>
-  <h1>Short URL: <%= shortURL %></h1>
+  <h1>TinyApp</h1>
+  <h2>Short URL: http://localhost:8080/u/<%= shortURL %> </h2>
   <table>
   <% for(var item in urls) { %>
   <%  if(item === shortURL) { %>
     <tr>
-      <td> <form method="POST" action="<%= `/urls/${item}/update` %>" >
-            <input type=text name="updatedUrl" id="updatedUrl" value=<%= urls[item].url %> style="width: 300px"> </td>
-      <td> <button type="submit">Update URL</button> </td></form>
-
+      <td>  <form method="POST" action="<%= `/urls/${item}/update` %>" >
+            <input type=text name="updatedUrl" id="updatedUrl" value=<%= urls[item].url %> style="width: 300px">
+            <button type="submit">Update URL</button>
+      </td></form>
     </tr>
   <% } %>
   <% } %>

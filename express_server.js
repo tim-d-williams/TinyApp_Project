@@ -2,7 +2,6 @@ var express = require("express");
 var app = express();
 var PORT = 8080; // default port 8080
 var morgan = require('morgan');
-// var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
@@ -12,7 +11,6 @@ const bodyParser = require("body-parser");
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
-// app.use(cookieParser());
 // set morgan
 app.use(morgan('dev'));
 app.use(cookieSession({
@@ -75,17 +73,16 @@ let urlsForUser = id => {
     } return tempDb
   }
 
+//counter to track number of times u/:id page is used
   let count = 0;
   counter = function(id) {
     count = urlDatabase[id].count || 0;
     urlDatabase[id].count = count +=1;
-
     return count;
     }
 
 
-
-
+//get date to use when url is created in /register
   var date = new Date();
   var year = date.getFullYear()
   var month = date.getMonth() + 1;
