@@ -5,9 +5,10 @@ var morgan = require('morgan');
 var cookieSession = require('cookie-session');
 const bcrypt = require('bcrypt');
 const saltRounds = 10;
-
-
 const bodyParser = require("body-parser");
+// const styles = require('./assets/styles.css')
+
+app.use(express.static('./assets'));
 
 app.set("view engine", "ejs");
 app.use(bodyParser.urlencoded({extended: true}));
@@ -81,15 +82,14 @@ let urlsForUser = id => {
     return count;
     }
 
-
 //get date to use when url is created in /register
   var date = new Date();
   var year = date.getFullYear()
   var month = date.getMonth() + 1;
       month = (month < 10 ? "0" : "") + month;
-  var day  = date.getDate() - 1;
+  var day  = date.getDate();
       day = (day < 10 ? "0" : "") + day;
-  var todaysDate = `${year}-${month}-${day}`
+  var todaysDate = `${month}/${day}/${year}`
 
 // '/' returns 'Hello!'
 app.get("/", (req, res) => {
@@ -125,37 +125,55 @@ app.get("/urls.json", (req, res) => {
   })
 
 app.get('/login', (req, res) => {
+  let user_id = req.session.user_id;
+  if (user_id) {
+    res.redirect('/urls')
+  }
   res.render('login')
 })
 
-//GET register endpoint
+//check if logged in, if not render page
 app.get('/register', (req, res) => {
+  let user_id = req.session.user_id;
+  if (user_id) {
+    res.redirect('/urls')
+  }
   res.render('register')
 })
 
 //POST route for register
 //add new user to the user data
 app.post('/register', (req, res) => {
-  //if email or password is empty
-  if (!req.body.email || !req.body.password) {
-    res.sendStatus(400);
-  }
-  //if email exists
-  for (let key in users) {
-    if (users[key].email === req.body.email) {
-      res.sendStatus(400);
-    }
-  }
-  let newId = generateRandomString();
+  let email = req.body.email;
   let password = req.body.password;
-  var hashedPassword = bcrypt.hashSync(password, saltRounds);
-  users[newId] = newId = {
-    id: newId,
-    email: req.body.email,
-    password: hashedPassword
+  console.log(email, password)
+  if (email) {
+    if (password) {
+      let inUsers = false;
+      for (var key in users) {
+        if (users[key].email === email) {
+          inUsers = true;
+        }
+      }
+        if (inUsers === false) {
+          let newId = generateRandomString();
+          var hashedPassword = bcrypt.hashSync(password, saltRounds);
+          users[newId] = newId = {
+            id: newId,
+            email: req.body.email,
+            password: hashedPassword
+          }
+            req.session.user_id = newId.id;
+            res.redirect('/urls');
+        } else {
+          res.status(400).send('<h1>Email address already exist, try logging in.</h1>');
+        }
+    } else {
+    res.status(400).send('<h1>Email address or password was not provided. Please try again.</h1>');
+    }
+  } else {
+    res.status(400).send('<h1>Email address or password was not provided. Please try again.</h1>');
   }
-    req.session.user_id = newId.id;
-    res.redirect('/urls');
 });
 
 //logout and clear cookie
@@ -166,11 +184,14 @@ app.post("/logout", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let userId = req.session.user_id
-  let templateVars = { urls: urlsForUser(userId),
-    user_id: users[req.session.user_id]
-  };
-  console.log('vars: ', templateVars);
-  res.render("urls_index", templateVars);
+  if (userId) {
+    let templateVars = { urls: urlsForUser(userId),
+      user_id: users[req.session.user_id]
+    }
+    res.render("urls_index", templateVars);
+  } else {
+    res.send('Please login to access this page')
+  }
 });
 
 //return urls page to browser
@@ -186,6 +207,7 @@ app.get("/urls/new", (req, res) => {
   }
 });
 
+//generate new id and add to database
 app.post("/urls", (req, res) => {
   let newShortUrl = generateRandomString();
   urlDatabase[newShortUrl] = {
@@ -195,53 +217,85 @@ app.post("/urls", (req, res) => {
     date: todaysDate,
     counter: 0
   }
-  res.redirect("/urls");
+  let newUrl = ('/urls/'+newShortUrl)
+  res.redirect(newUrl);
 });
 
 
 app.get("/u/:shortURL", (req, res) => {
   let urlId = req.params.shortURL
-  if (urlDatabase[urlId] === undefined) {
-    res.redirect(404, '/urls/new')
+  if (!urlDatabase[urlId]) {
+    console.log(urlDatabase[urlId]);
+    res.status(404).send('This URL does not exist');
   } else {
-     ;
-  console.log('get u shorturl: ', urlDatabase)
   let longURL = urlDatabase[urlId].url
   res.redirect(longURL);
    counter(urlId)
-   console.log("count: ",urlDatabase[urlId].count)
   }
 });
 
-//add urls to template var
+//check if user is logged in
+  //if not, return error
+//then check if url is valid
+  //if not, return error
+//then check if user is owner
+  //if not return error
+//else return page
 app.get("/urls/:id", (req, res) => {
-  let templateVars = { shortURL: req.params.id,
-    urls: urlDatabase,
-    user_id: users[req.session.user_id] };
-  res.render("urls_show", templateVars);
+  let urlId = req.params.id;
+  let user_id = req.session.user_id
+
+  if (user_id) {
+    if (urlDatabase[urlId]) {
+     if (urlDatabase[urlId].user_id === user_id) {
+        let templateVars = { shortURL: urlId,
+          urls: urlDatabase,
+          user_id: users[req.session.user_id] };
+        res.render("urls_show", templateVars);
+      } else {
+        res.send('Only URL owner can access this page')
+      }
+    } else {
+      res.status(404).send('This URL does not exist')
+    }
+  } else {
+    res.send('Please login to access this page')
+  }
 });
 
 //use POST req to DELETE url entry
 //if url owner is same as logged in user allow delete
 app.post('/urls/:id/delete', (req, res) => {
   let urlToDelete = req.params.id;
-    if (urlDatabase[req.params.id].user_id === req.session.user_id) {
+  let user_id = req.session.user_id
+
+  if (user_id) {
+    if (urlDatabase[urlToDelete].user_id === user_id) {
       delete urlDatabase[urlToDelete]
       res.redirect('/urls')
-    }
-    else
+    } else {
       res.send('Only URL owner can delete')
+      }
+    } else {
+    res.send('Please login to access this page')
+    }
 });
 
 //use POST to update url database entrty
 app.post('/urls/:id/update', (req, res) => {
   let urlToUpdateId = req.params.id;
-  if (urlDatabase[req.params.id].user_id === req.session.user_id) {
-    urlDatabase[urlToUpdateId].url = req.body.updatedUrl
-    res.redirect('/urls')
-  }
-  else
-    res.send('Only URL owner can update')
+  let user_id = req.session.user_id
+
+  if (user_id) {
+    if (urlDatabase[urlToUpdateId].user_id === user_id) {
+      urlDatabase[urlToUpdateId].url = req.body.updatedUrl
+      res.redirect('/urls')
+    } else {
+      res.send('Only URL owner can delete')
+      }
+    } else {
+    res.send('Please login to access this page')
+    }
 })
 
 

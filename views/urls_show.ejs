@@ -1,7 +1,8 @@
 <!-- views/urls_show.ejs -->
 <html lang="en">
 <head>
-  <title>TinyApp</title>
+<link rel="stylesheet" type="text/css" href=".././styles.css" />
+<title>TinyApp</title>
 </head>
 <body>
   <header>
@@ -16,7 +17,10 @@
       <td>  <form method="POST" action="<%= `/urls/${item}/update` %>" >
             <input type=text name="updatedUrl" id="updatedUrl" value=<%= urls[item].url %> style="width: 300px">
             <button type="submit">Update URL</button>
-      </td></form>
+            </form>
+      </td>
+      <td>Created on: <%= urls[item].date %></td>
+      <td>This URL accessed <%= urls[item].count %> times</td>
     </tr>
   <% } %>
   <% } %>
