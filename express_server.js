@@ -35,12 +35,12 @@ const urlDatabase = {
   "b2xVn2": {
     shortURL: "b2xVn2",
     url: "http://www.lighthouselabs.ca",
-    user_id: "222"
+    user_id: "vojdf2"
   },
   "9sm5xK": {
     shortURL: "9sm5xK",
     url:  "http://www.google.com",
-    user_id: "111"
+    user_id: "vojdf2"
   }
 };
 
@@ -50,10 +50,10 @@ const users = {
     email: "tim@example.com",
     password: "beer"
   },
- "222": {
-    id: "222",
-    email: "test@example.com",
-    password: "suh"
+ "vojdf2": {
+    id: "vojdf2",
+    email: "timwilliams.tx@gmail.com",
+    password: "$2b$10$GqgM5tmIofmgL4DCcHAYD.JfmO3WVTcY3hmj9L9Q75kVpmPybramO"
   }
 }
 
@@ -68,15 +68,39 @@ let urlsForUser = id => {
         shortURL: urlDatabase[key].shortURL,
         url: urlDatabase[key].url,
         user_id: urlDatabase[key].user_id,
+        date: urlDatabase[key].date,
+        count: urlDatabase[key].count
         }
       }
     } return tempDb
   }
 
+  let count = 0;
+  counter = function(id) {
+    count = urlDatabase[id].count || 0;
+    urlDatabase[id].count = count +=1;
+
+    return count;
+    }
+
+
+
+
+  var date = new Date();
+  var year = date.getFullYear()
+  var month = date.getMonth() + 1;
+      month = (month < 10 ? "0" : "") + month;
+  var day  = date.getDate() - 1;
+      day = (day < 10 ? "0" : "") + day;
+  var todaysDate = `${year}-${month}-${day}`
 
 // '/' returns 'Hello!'
 app.get("/", (req, res) => {
-  res.send("Hello!");
+  let userId = req.session.user_id
+  if (userId) {
+    res.redirect('/urls')
+  }
+  res.redirect('/login');
 });
 
 //return urlDatatbase
@@ -148,6 +172,7 @@ app.get("/urls", (req, res) => {
   let templateVars = { urls: urlsForUser(userId),
     user_id: users[req.session.user_id]
   };
+  console.log('vars: ', templateVars);
   res.render("urls_index", templateVars);
 });
 
@@ -169,17 +194,25 @@ app.post("/urls", (req, res) => {
   urlDatabase[newShortUrl] = {
     shortURL: newShortUrl,
     url: (req.body.longURL),
-    user_id: req.session.user_id
+    user_id: req.session.user_id,
+    date: todaysDate,
+    counter: 0
   }
   res.redirect("/urls");
 });
 
+
 app.get("/u/:shortURL", (req, res) => {
-  if (urlDatabase[req.params.shortURL] === undefined) {
+  let urlId = req.params.shortURL
+  if (urlDatabase[urlId] === undefined) {
     res.redirect(404, '/urls/new')
   } else {
-  let longURL = urlDatabase[req.params.shortURL].url
+     ;
+  console.log('get u shorturl: ', urlDatabase)
+  let longURL = urlDatabase[urlId].url
   res.redirect(longURL);
+   counter(urlId)
+   console.log("count: ",urlDatabase[urlId].count)
   }
 });
 
