@@ -1,29 +1,30 @@
 <!-- views/urls_show.ejs -->
 <html lang="en">
-<head>
-<link rel="stylesheet" type="text/css" href=".././styles.css" />
-<title>TinyApp</title>
-</head>
-<body>
-  <header>
-    <% include ./partials/_header %>
-  </header>
-  <h1>TinyApp</h1>
-  <h2>Short URL: http://localhost:8080/u/<%= shortURL %> </h2>
-  <table>
-  <% for(var item in urls) { %>
-  <%  if(item === shortURL) { %>
-    <tr>
-      <td>  <form method="POST" action="<%= `/urls/${item}/update` %>" >
-            <input type=text name="updatedUrl" id="updatedUrl" value=<%= urls[item].url %> style="width: 300px">
-            <button type="submit">Update URL</button>
-            </form>
-      </td>
-      <td>Created on: <%= urls[item].date %></td>
-      <td>This URL accessed <%= urls[item].count %> times</td>
-    </tr>
-  <% } %>
-  <% } %>
-  </table>
-</body>
+  <head>
+    <link rel="stylesheet" type="text/css" href=".././styles.css" />
+    <title>TinyApp</title>
+  </head>
+  <body>
+    <header>
+      <% include ./partials/_header %>
+    </header>
+    <h3>Short URL: http://localhost:8080/u/<%= shortURL %> </h3>
+    <table>
+    <% for(var item in urls) { %>
+    <%  if(item === shortURL) { %>
+      <tr>
+        <td>  <form method="POST" action="<%= `/urls/${item}/update` %>" >
+              <input type=text name="updatedUrl" id="updatedUrl" value=<%= urls[item].url %> >
+        </td>
+        <td>
+        <button type="submit">Update URL</button>
+        </form>
+        </td>
+        <td><p>Created on: <%= urls[item].date %></p></td>
+        <td><p>This URL accessed <%= urls[item].count %> times</p></td>
+      </tr>
+    <% } %>
+    <% } %>
+    </table>
+  </body>
 </html>

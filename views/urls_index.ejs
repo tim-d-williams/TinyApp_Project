@@ -8,21 +8,28 @@
 <header>
 <% include ./partials/_header %>
 </header>
-<h1>TinyApp URL Shortener</h1>
   <table>
-    <% for(var item in urls) { %>
+      <tr>
+        <th>Short URL</th>
+        <th>Long URL</th>
+        <th>Date Created</th>
+        <th>Number of Visits</th>
+      </tr>
+      <% for(var item in urls) { %>
       <tr>
         <td> <a href=<%= `http://localhost:8080/u/${urls[item].shortURL}` %> >http://localhost:8080/u/<%= urls[item].shortURL %></a> </td>
         <td> <%= urls[item].url %> </td>
-        <td>Created on: <%= urls[item].date %></td>
-        <td>This URL accessed <%= urls[item].count %> times</td>
+        <td> <%= urls[item].date %> </td>
+        <td style="text-align: center"> <%= urls[item].count %> </td>
         <td> <form method="GET" action=<%= `/urls/${urls[item].shortURL}` %> > <button type="submit">Edit</button> </form> </td>
         <td> <form method="POST" action=<%= `/urls/${item}/delete` %> > <button type="submit">Delete</button> </form> </td>
-      <tr>
+      </tr>
       <% } %>
   </table>
+  <div class="link">
   <% if (user_id !== undefined) { %>
   <a href='/urls/new'>Create a New Short Link</a>
   <% }  %>
+  </div>
 </body>
 </html>
