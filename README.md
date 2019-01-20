@@ -8,7 +8,7 @@ TinyApp is a full stack web application built with Node and Express that allows 
 !["Screenshot of the edit URLs page"](https://github.com/tim-d-williams/TinyApp_Project/blob/master/docs/edit-urls.png?raw=true)
 
 
-##Dependencies
+## Dependencies
 
 - Node.js
 - Express
